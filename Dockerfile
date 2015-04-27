@@ -5,8 +5,9 @@ MAINTAINER  Shaker Qawasmi "http://github.com/sqawasmi"
 # Update the package repository
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \ 
 	DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl locales build-essential bzip2 libssl-dev libxml2-dev libpcre3-dev tcl-dev libboost-dev
-
+	DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl locales build-essential bzip2 libssl-dev libxml2-dev libpcre3-dev tcl-dev libboost-dev \
+	gnupg
+	
 # Configure locale
 RUN export LANGUAGE=en_US.UTF-8 && \
 	export LANG=en_US.UTF-8 && \
@@ -16,7 +17,10 @@ RUN export LANGUAGE=en_US.UTF-8 && \
 
 # Install TrafficServer
 RUN mkdir -p /downloads/trafficserver
-RUN wget http://download.nextag.com/apache/trafficserver/trafficserver-5.1.0.tar.bz2 -O /downloads/trafficserver.tar.bz2
+RUN wget https://www.eu.apache.org/dist/trafficserver/trafficserver-5.2.1.tar.bz2 -O /downloads/trafficserver.tar.bz2
+RUN wget https://www.apache.org/dist/trafficserver/trafficserver-5.2.1.tar.bz2.asc -O /downloads/trafficserver.tar.bz2.asc
+RUN wget https://www.apache.org/dist/trafficserver/KEYS -O /downloads/KEYS
+RUN cd /downloads && gpg --import KEYS && gpg --verify trafficserver.tar.bz2.asc
 RUN cd /downloads && tar xvf trafficserver.tar.bz2 -C /downloads/trafficserver --strip-components 1
 RUN cd /downloads/trafficserver && ./configure --prefix=/opt/trafficserver
 RUN cd /downloads/trafficserver && make
